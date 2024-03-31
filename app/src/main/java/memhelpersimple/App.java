@@ -18,20 +18,20 @@ import ui.Ui;
  * @author cyrax
  */
 public class App {
+
     private Ui ui;
     Properties props;
+    Properties versionProps;
     private static final Logger logger = Logger.getLogger(App.class.getName());
-    
-    public App() {
+
+    public App() throws IOException {
         ui = new ConsoleUi();
         props = new Properties();
-    }
-    private Properties loadProperties() throws FileNotFoundException, IOException  {
-        Properties props = new Properties();
         props.load(new FileInputStream("dictionnaire.properties"));
-        return props;
+        versionProps = new Properties();
+        versionProps.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("version.properties"));
     }
-    
+
     private void recite() {
         String word, translation, message;
         final int limit = Math.min(props.size(), 10);
@@ -54,26 +54,26 @@ public class App {
             }
             i++;
         }
-        double percentage = ((double)score / (double)limit) * 100.00;
+        double percentage = ((double) score / (double) limit) * 100.00;
         if (percentage < 20) {
-            message="Oh lala, franchement vous deconnez la!";
+            message = "Oh lala, franchement vous deconnez la!";
         } else if (percentage < 40) {
-            message="La honte est quelque chose qui peut pousser quelqu'un a s'ameliorer, "
+            message = "La honte est quelque chose qui peut pousser quelqu'un a s'ameliorer, "
                     + "et vous devriez en avoir au moins un peu en ce moment ...";
         } else if (percentage < 50) {
-            message="Vous avez encore du travail a faire!";
+            message = "Vous avez encore du travail a faire!";
         } else if (percentage > 98) {
-            message="Parfait!";
+            message = "Parfait!";
         } else if (percentage > 80) {
-            message="Excellent!";
+            message = "Excellent!";
         } else if (percentage > 70) {
-            message="Pas mal, vous avez fait du progres!";
+            message = "Pas mal, vous avez fait du progres!";
         } else {
-            message="Encore assez moyen tout ca ...";
+            message = "Encore assez moyen tout ca ...";
         }
         ui.showFinalScore(percentage, score, limit, message);
     }
-    
+
     private void saveProps() {
         try {
             props.store(new FileOutputStream("dictionnaire.properties"), null);
@@ -83,55 +83,42 @@ public class App {
             Logger.getLogger(App.class.getName()).log(Level.SEVERE, "Erreur d'I/O", ex);
         }
     }
-    
+
     private void searchWord() {
         final String word = ui.askWord();
         ui.showWord(word, props.containsKey(word) ? Optional.of(props.getProperty(word)) : Optional.empty());
     }
     
+    private void displayVersion() {
+        ui.displayVersion(versionProps);
+    }
+
     public void run() {
-        try {
-            String option;
-            props = loadProperties();
-            boolean end = false;
-            while (!end) {
-                option = ui.askOption();
-                switch (option) {
-                    case "0":
-                        end = true;
-                        break;
-                    case "1":
-                        ui.showDictionary(props);
-                        break;
-                    case "2":
-                        ui.addTranslation(props);
-                        saveProps();
-                        break;
-                    case "3":
-                        ui.modifyTranslation(props);
-                        saveProps();
-                        break;                        
-                    case "4":
-                        ui.deleteTranslation(props);
-                        saveProps();
-                        break;
-                    case "5":
-                        recite();
-                        break;
-                    case "6":
-                        searchWord();
-                        break;
-                    default:
-                        ui.showMessage("L'option '" + option + "' est invalide");
-                        break;
+        String option;
+        boolean end = false;
+        while (!end) {
+            option = ui.askOption();
+            switch (option) {
+                case "0" -> end = true;
+                case "1" -> ui.showDictionary(props);
+                case "2" -> {
+                    ui.addTranslation(props);
+                    saveProps();
                 }
+                case "3" -> {
+                    ui.modifyTranslation(props);
+                    saveProps();
+                }
+                case "4" -> {
+                    ui.deleteTranslation(props);
+                    saveProps();
+                }
+                case "5" -> recite();
+                case "6" -> searchWord();
+                case "7" -> displayVersion();
+                default -> ui.showMessage("L'option '" + option + "' est invalide");
             }
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(App.class.getName()).log(Level.SEVERE, "Fichier introuvable", ex);
-        } catch (IOException ex) {
-            Logger.getLogger(App.class.getName()).log(Level.SEVERE, "IO exception", ex);
         }
     }
-    
-    
+
 }

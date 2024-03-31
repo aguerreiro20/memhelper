@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -37,6 +38,7 @@ public class ConsoleUi implements Ui {
         System.out.println("4 - Supprimer une entree");
         System.out.println("5 - Reciter!");
         System.out.println("6 - Chercher un mot");
+        System.out.println("7 - Afficher la version de l'application");
         System.out.println("0 - Quitter le programme");
         System.out.println("=================================");
     }
@@ -165,6 +167,15 @@ public class ConsoleUi implements Ui {
         } else {
             System.out.println("Traduction:");
             System.out.println(String.format("%s = %s", word, optTranslation.get()));
+        }
+    }
+    
+    @Override
+    public void displayVersion(final Properties versionProps) {
+        System.out.println("----- Version de l'application -----");
+        List<String> keys = versionProps.keySet().stream().map(String::valueOf).sorted().collect(Collectors.toList());
+        for(String key: keys) {
+            System.out.println(String.format("- %s: %s", key, versionProps.get(key)));
         }
     }
 }

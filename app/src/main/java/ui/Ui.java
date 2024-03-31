@@ -20,4 +20,5 @@ public interface Ui {
     void showFinalScore(double percentage, int score, int limit, String message);
     String askWord();
     void showWord(final String word, final Optional<String> optTranslation);
+    void displayVersion(final Properties versionProperties);
 }
