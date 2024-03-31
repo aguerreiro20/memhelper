@@ -59,15 +59,17 @@ public class ConsoleUi implements Ui {
     public void showDictionary(final Properties props) {
         int i = 1;
         char tmp, letter='a';
+        String padding;
         System.out.println("---------------------------------");
         List<String> words = props.keySet().stream().map(String::valueOf).sorted().collect(Collectors.toList());
         for (String word : words) {
             tmp = Character.toUpperCase(word.charAt(0));
+            padding = i > 9 ? "" : " ";
             if (tmp != letter) {
                 letter = tmp;
-                System.out.println(String.format("%d) [%c] %s = %s", i, letter, word, props.get(word)));
+                System.out.println(String.format("%s%d) [%c] %s = %s", padding, i, letter, word, props.get(word)));
             } else {
-                System.out.println(String.format("%d)     %s = %s", i, word, props.get(word)));
+                System.out.println(String.format("%s%d)     %s = %s", padding, i, word, props.get(word)));
             }
             i++;
         }
