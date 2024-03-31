@@ -99,7 +99,10 @@ public class App {
         while (!end) {
             option = ui.askOption();
             switch (option) {
-                case "0" -> end = true;
+                case "0" -> {
+                    end = true;
+                    ui.close();
+                }
                 case "1" -> ui.showDictionary(props);
                 case "2" -> {
                     ui.addTranslation(props);

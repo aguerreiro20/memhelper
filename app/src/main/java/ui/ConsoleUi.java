@@ -177,4 +177,9 @@ public class ConsoleUi implements Ui {
             System.out.println(String.format("- %s: %s", key, versionProps.get(key)));
         }
     }
+    
+    @Override
+    public void close() {
+        sc.close();
+    }
 }
