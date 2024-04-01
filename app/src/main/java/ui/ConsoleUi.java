@@ -113,9 +113,11 @@ public class ConsoleUi implements Ui {
                 break;
             } else if (!dictionary.contains(word)) {
                 clearTerminal();
-                System.out.println("Ce mot n'existe pas, vous devez l'ajouter d'abord");
+                System.out.println("Ce mot n'existe pas, vous devez d'abord l'ajouter au dictionnaire: " + word);
+                System.out.println("");
             } else {
-                System.out.println("Entrez sa nouvelle traduction:");
+                System.out.println(String.format(
+                        "Entrez sa nouvelle traduction (ancienne: '%s'):", dictionary.get(word)));
                 translation = sc.nextLine();
                 clearTerminal();
                 dictionary.put(word, translation);
