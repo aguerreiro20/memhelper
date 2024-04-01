@@ -6,6 +6,7 @@ import java.util.Properties;
 import java.util.Scanner;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import model.Dictionary;
 
 /**
  *
@@ -56,20 +57,20 @@ public class ConsoleUi implements Ui {
     }
 
     @Override
-    public void showDictionary(final Properties props) {
+    public void showDictionary(final Dictionary dictionary) {
         int i = 1;
         char tmp, letter = 'a';
         String padding;
         System.out.println("---------------------------------");
-        List<String> words = props.keySet().stream().map(String::valueOf).sorted().collect(Collectors.toList());
-        for (String word : words) {
-            tmp = Character.toUpperCase(word.charAt(0));
+        List<String> keys = dictionary.getSortedKeys();
+        for (String key : keys) {
+            tmp = Character.toUpperCase(key.charAt(0));
             padding = i > 9 ? i > 99 ? "" : " " : "  ";
             if (tmp != letter) {
                 letter = tmp;
-                System.out.println(String.format("%s%d) [%c] %s = %s", padding, i, letter, word, props.get(word)));
+                System.out.println(String.format("%s%d) [%c] %s = %s", padding, i, letter, key, dictionary.get(key)));
             } else {
-                System.out.println(String.format("%s%d)     %s = %s", padding, i, word, props.get(word)));
+                System.out.println(String.format("%s%d)     %s = %s", padding, i, key, dictionary.get(key)));
             }
             i++;
         }
@@ -77,7 +78,7 @@ public class ConsoleUi implements Ui {
     }
 
     @Override
-    public void addTranslation(final Properties props) {
+    public void addTranslation(final Dictionary dictionary) {
         String word, translation;
         while (true) {
             System.out.println("Entrez le mot a traduire (ou '0' pour sauvegarder et retourner au menu principal):");
@@ -85,14 +86,14 @@ public class ConsoleUi implements Ui {
             if (word.equals("0")) {
                 clearTerminal();
                 break;
-            } else if (props.containsKey(word)) {
+            } else if (dictionary.contains(word)) {
                 clearTerminal();
-                System.out.println(String.format("Ce mot existe deja! Sa traduction est: %s", props.getProperty(word)));
+                System.out.println(String.format("Ce mot existe deja! Sa traduction est: %s", dictionary.get(word)));
             } else {
                 System.out.println("Entrez sa traduction:");
                 translation = sc.nextLine();
                 clearTerminal();
-                props.setProperty(word, translation);
+                dictionary.put(word, translation);
                 System.out.println("Traduction ajoutee!");
                 System.out.println(String.format("%s = %s", word, translation));
                 System.out.println("");
@@ -101,7 +102,7 @@ public class ConsoleUi implements Ui {
     }
 
     @Override
-    public void modifyTranslation(final Properties props) {
+    public void modifyTranslation(final Dictionary dictionary) {
         String word, translation;
         word = "";
         while (true) {
@@ -110,14 +111,14 @@ public class ConsoleUi implements Ui {
             if (word.equals("0")) {
                 clearTerminal();
                 break;
-            } else if (!props.containsKey(word)) {
+            } else if (!dictionary.contains(word)) {
                 clearTerminal();
                 System.out.println("Ce mot n'existe pas, vous devez l'ajouter d'abord");
             } else {
                 System.out.println("Entrez sa nouvelle traduction:");
                 translation = sc.nextLine();
                 clearTerminal();
-                props.setProperty(word, translation);
+                dictionary.put(word, translation);
                 System.out.println("Traduction modifiee!");
                 System.out.println(String.format("%s = %s", word, translation));
                 System.out.println("");
@@ -126,7 +127,7 @@ public class ConsoleUi implements Ui {
     }
 
     @Override
-    public void deleteTranslation(final Properties props) {
+    public void deleteTranslation(final Dictionary dictionary) {
         String word;
         while (true) {
             System.out.println("Entrez le mot a supprimer (ou '0' pour sauvegarder et retourner au menu principal):");
@@ -134,13 +135,13 @@ public class ConsoleUi implements Ui {
             if (word.equals("0")) {
                 clearTerminal();
                 break;
-            } else if (!props.containsKey(word)) {
+            } else if (!dictionary.contains(word)) {
                 clearTerminal();
                 System.out.println(String.format("Ce terme (%s) n'existe pas, vous devez l'ajouter d'abord", word));
                 System.out.println("");
             } else {
                 clearTerminal();
-                props.remove(word);
+                dictionary.remove(word);
                 System.out.println(String.format("Traduction supprimee! (%s)", word));
                 System.out.println("");
             }
@@ -181,7 +182,7 @@ public class ConsoleUi implements Ui {
     }
 
     @Override
-    public void searchWord(final Properties props) {
+    public void searchWord(final Dictionary dictionary) {
         String word;
         clearTerminal();
         while (true) {
@@ -190,9 +191,9 @@ public class ConsoleUi implements Ui {
             clearTerminal();
             if (word.equals("0")) {
                 break;
-            } else if (props.containsKey(word)) {
+            } else if (dictionary.contains(word)) {
                 System.out.println("Traduction:");
-                System.out.println(String.format("%s = %s", word, props.getProperty(word)));
+                System.out.println(String.format("%s = %s", word, dictionary.get(word)));
                 System.out.println("");
             } else {
                 System.out.println(String.format("'%s' n'existe pas dans le dictionnaire", word));

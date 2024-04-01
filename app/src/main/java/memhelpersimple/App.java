@@ -1,17 +1,11 @@
 package memhelpersimple;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
+import model.Dictionary;
 import ui.ConsoleUi;
 import ui.Ui;
 
@@ -22,41 +16,40 @@ import ui.Ui;
 public class App {
 
     private Ui ui;
-    Properties props;
+    Dictionary dictionary;
     Properties versionProps;
     private static final Logger logger = Logger.getLogger(App.class.getName());
 
     public App() throws IOException {
         ui = new ConsoleUi();
-        props = new Properties();
-        props.load(new FileInputStream("dictionnaire.properties"));
+        dictionary = new Dictionary();
+        dictionary.load();
         versionProps = new Properties();
         versionProps.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("version.properties"));
     }
 
     private void recite() {
-        String word, translation, message;
-        final int limit = Math.min(props.size(), 10);
+        String expectedWord, translation, message;
         int score = 0;
         int i = 0;
-        boolean tilTheEnd = true;
-        List<String> keys = props.keySet().stream().map(String::valueOf).collect(Collectors.toList());
-        Collections.shuffle(keys);
+        final int limit = Math.min(dictionary.size(), 10);
+        if (limit > 0) {
+        Map<String, String> shortlist = dictionary.createShortlist(limit);
         ui.remindRecitationRules(limit);
-        while (tilTheEnd && i < limit) {
-            word = keys.get(i);
-            translation = ui.askTranslation(word, score, limit, i);
+        for (String key: shortlist.keySet()) {
+            expectedWord = shortlist.get(key);
+            translation = ui.askTranslation(key, score, limit, i);
             if (translation.equals("0")) {
-                tilTheEnd = false;
+                break;
             } else {
-                if (Arrays.stream(props.getProperty(word).split(",")).anyMatch(translation::equals)) {
+                if (Arrays.stream(expectedWord.split(",")).anyMatch(translation::equals)) {
                     score++;
-                    ui.feedback(String.format("C'est correct! (%s = %s)", word, props.get(word)));
+                    ui.feedback(String.format("C'est correct! (%s = %s)", key, expectedWord));
                 } else {
-                    ui.feedback(String.format("Faux! Reponse correcte: %s = %s", word, props.get(word)));
+                    ui.feedback(String.format("Faux! Reponse correcte: %s = %s", key, expectedWord));
                 }
                 i++;
-            }
+            }            
         }
         double percentage = ((double) score / (double) limit) * 100.00;
         if (percentage < 20) {
@@ -76,20 +69,18 @@ public class App {
             message = "Encore assez moyen tout ca ...";
         }
         ui.showFinalScore(percentage, score, limit, message);
-    }
-
-    private void saveProps() {
-        try {
-            props.store(new FileOutputStream("dictionnaire.properties"), null);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(App.class.getName()).log(Level.SEVERE, "Fichier introuvable", ex);
-        } catch (IOException ex) {
-            Logger.getLogger(App.class.getName()).log(Level.SEVERE, "Erreur d'I/O", ex);
+        } else {
+            ui.showMessage("Vous ne pouvez pas prendre de test avec un dictionnaire vide."
+                    + " Vous devez d'abord le remplir un peu");
         }
     }
 
+    private void saveProps() {
+        dictionary.save();
+    }
+
     private void searchWord() {
-        ui.searchWord(props);
+        ui.searchWord(dictionary);
     }
 
     private void displayVersion() {
@@ -107,17 +98,17 @@ public class App {
                     ui.close();
                 }
                 case "1" ->
-                    ui.showDictionary(props);
+                    ui.showDictionary(dictionary);
                 case "2" -> {
-                    ui.addTranslation(props);
+                    ui.addTranslation(dictionary);
                     saveProps();
                 }
                 case "3" -> {
-                    ui.modifyTranslation(props);
+                    ui.modifyTranslation(dictionary);
                     saveProps();
                 }
                 case "4" -> {
-                    ui.deleteTranslation(props);
+                    ui.deleteTranslation(dictionary);
                     saveProps();
                 }
                 case "5" ->
