@@ -4,6 +4,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -39,20 +41,22 @@ public class App {
         int i = 0;
         boolean tilTheEnd = true;
         List<String> keys = props.keySet().stream().map(String::valueOf).collect(Collectors.toList());
+        Collections.shuffle(keys);
         ui.remindRecitationRules(limit);
         while (tilTheEnd && i < limit) {
             word = keys.get(i);
             translation = ui.askTranslation(word, score, limit, i);
             if (translation.equals("0")) {
                 tilTheEnd = false;
-            }
-            if (translation.equals(props.get(word))) {
-                score++;
-                ui.feedback("C'est correct!");
             } else {
-                ui.feedback(String.format("Faux! Reponse correcte: %s", props.get(word)));
+                if (Arrays.stream(props.getProperty(word).split(",")).anyMatch(translation::equals)) {
+                    score++;
+                    ui.feedback(String.format("C'est correct! (%s = %s)", word, props.get(word)));
+                } else {
+                    ui.feedback(String.format("Faux! Reponse correcte: %s = %s", word, props.get(word)));
+                }
+                i++;
             }
-            i++;
         }
         double percentage = ((double) score / (double) limit) * 100.00;
         if (percentage < 20) {
@@ -66,7 +70,7 @@ public class App {
             message = "Parfait!";
         } else if (percentage > 80) {
             message = "Excellent!";
-        } else if (percentage > 70) {
+        } else if (percentage > 60) {
             message = "Pas mal, vous avez fait du progres!";
         } else {
             message = "Encore assez moyen tout ca ...";
@@ -85,10 +89,9 @@ public class App {
     }
 
     private void searchWord() {
-        final String word = ui.askWord();
-        ui.showWord(word, props.containsKey(word) ? Optional.of(props.getProperty(word)) : Optional.empty());
+        ui.searchWord(props);
     }
-    
+
     private void displayVersion() {
         ui.displayVersion(versionProps);
     }
@@ -103,7 +106,8 @@ public class App {
                     end = true;
                     ui.close();
                 }
-                case "1" -> ui.showDictionary(props);
+                case "1" ->
+                    ui.showDictionary(props);
                 case "2" -> {
                     ui.addTranslation(props);
                     saveProps();
@@ -116,10 +120,14 @@ public class App {
                     ui.deleteTranslation(props);
                     saveProps();
                 }
-                case "5" -> recite();
-                case "6" -> searchWord();
-                case "7" -> displayVersion();
-                default -> ui.showMessage("L'option '" + option + "' est invalide");
+                case "5" ->
+                    recite();
+                case "6" ->
+                    searchWord();
+                case "7" ->
+                    displayVersion();
+                default ->
+                    ui.showMessage("L'option '" + option + "' est invalide");
             }
         }
     }

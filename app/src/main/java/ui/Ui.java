@@ -18,8 +18,7 @@ public interface Ui {
     String askTranslation(final String word, final int score, final int max, final int total);
     void feedback(final String message);
     void showFinalScore(double percentage, int score, int limit, String message);
-    String askWord();
-    void showWord(final String word, final Optional<String> optTranslation);
+    void searchWord(final Properties props);
     void displayVersion(final Properties versionProperties);
     void close();
 }
