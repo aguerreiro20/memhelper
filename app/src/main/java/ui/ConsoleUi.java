@@ -160,7 +160,7 @@ public class ConsoleUi implements Ui {
 
     @Override
     public String askTranslation(final String word, final int score, final int max, final int total) {
-        System.out.println(String.format("Score: %d/%d, question %d", score, max, total + 1));
+        System.out.println(String.format("Score: %d/%d (max:%d), question %d", score, total-1, max, total));
         System.out.println(String.format("'%s' = ?", word));
         return sc.nextLine();
     }
@@ -173,10 +173,10 @@ public class ConsoleUi implements Ui {
     }
 
     @Override
-    public void showFinalScore(double percentage, int score, int limit, String message) {
+    public void showFinalScore(double correctness, double completion, int score, int index, int limit, String message) {
         System.out.println("---------- Fin du jeu ! ----------");
-        System.out.println(String.format("- Score final: %d/%d", score, limit));
-        System.out.println(String.format("- Pourcentage de reussite: %.2f%s", percentage, "%"));
+        System.out.println(String.format("- Score final: %.2f%s (%d/%d)", correctness, "%", score, index));
+        System.out.println(String.format("- Completion:  %.2f%s (%d/%d)", completion, "%", index, limit));
         System.out.println(String.format("- Appreciation du jury: %s", message));
         System.out.println("----------------------------------");
     }

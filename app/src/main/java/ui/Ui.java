@@ -18,7 +18,7 @@ public interface Ui {
     void remindRecitationRules(final int limit);
     String askTranslation(final String word, final int score, final int max, final int total);
     void feedback(final String message);
-    void showFinalScore(double percentage, int score, int limit, String message);
+    void showFinalScore(double correctness, double completion, int score, int index, int limit, String message);
     void searchWord(final Dictionary dictionary);
     void displayVersion(final Properties versionProperties);
     void close();

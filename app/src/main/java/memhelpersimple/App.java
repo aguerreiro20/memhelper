@@ -32,14 +32,16 @@ public class App {
         String expectedWord, translation, message;
         int score = 0;
         int i = 0;
-        final int limit = Math.min(dictionary.size(), 10);
+        final int limit = dictionary.size();
         if (limit > 0) {
         Map<String, String> shortlist = dictionary.createShortlist(limit);
         ui.remindRecitationRules(limit);
         for (String key: shortlist.keySet()) {
+            i++;
             expectedWord = shortlist.get(key);
             translation = ui.askTranslation(key, score, limit, i);
             if (translation.equals("0")) {
+                i--;
                 break;
             } else {
                 if (Arrays.stream(expectedWord.split(",")).anyMatch(translation::equals)) {
@@ -48,27 +50,27 @@ public class App {
                 } else {
                     ui.feedback(String.format("Faux! Reponse correcte: %s = %s", key, expectedWord));
                 }
-                i++;
-            }            
+            }           
         }
-        double percentage = ((double) score / (double) limit) * 100.00;
-        if (percentage < 20) {
+        double correctness = score == 0 ? 0.00 : ((double) score / (double) i) * 100.00;
+        double completeness = ((double) i / (double) limit) * 100.00;
+        if (correctness < 21) {
             message = "Oh lala, franchement vous deconnez la!";
-        } else if (percentage < 40) {
+        } else if (correctness < 41) {
             message = "La honte est quelque chose qui peut pousser quelqu'un a s'ameliorer, "
                     + "et vous devriez en avoir au moins un peu en ce moment ...";
-        } else if (percentage < 50) {
+        } else if (correctness < 49) {
             message = "Vous avez encore du travail a faire!";
-        } else if (percentage > 98) {
+        } else if (correctness > 98) {
             message = "Parfait!";
-        } else if (percentage > 80) {
+        } else if (correctness > 79) {
             message = "Excellent!";
-        } else if (percentage > 60) {
+        } else if (correctness > 59) {
             message = "Pas mal, vous avez fait du progres!";
         } else {
             message = "Encore assez moyen tout ca ...";
         }
-        ui.showFinalScore(percentage, score, limit, message);
+        ui.showFinalScore(correctness, completeness, score, i, limit, message);
         } else {
             ui.showMessage("Vous ne pouvez pas prendre de test avec un dictionnaire vide."
                     + " Vous devez d'abord le remplir un peu");
