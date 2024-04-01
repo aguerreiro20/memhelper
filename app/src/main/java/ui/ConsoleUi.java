@@ -64,7 +64,7 @@ public class ConsoleUi implements Ui {
         List<String> words = props.keySet().stream().map(String::valueOf).sorted().collect(Collectors.toList());
         for (String word : words) {
             tmp = Character.toUpperCase(word.charAt(0));
-            padding = i > 9 ? "" : " ";
+            padding = i > 9 ? i > 99 ? "" : " " : "  ";
             if (tmp != letter) {
                 letter = tmp;
                 System.out.println(String.format("%s%d) [%c] %s = %s", padding, i, letter, word, props.get(word)));
