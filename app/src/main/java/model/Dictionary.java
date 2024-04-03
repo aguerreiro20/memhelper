@@ -49,7 +49,6 @@ public class Dictionary {
             }
         } else {
             System.out.println("Le fichier '" + path + "' n'existe pas, creation d'une nouvelle.");
-            map.put("hello", "world");
             save();
         }
         return true;
