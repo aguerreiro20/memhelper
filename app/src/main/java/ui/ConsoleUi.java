@@ -20,7 +20,7 @@ public class ConsoleUi implements Ui {
     public ConsoleUi() {
         sc = new Scanner(System.in);
         clearTerminal();
-        System.out.println("Bonjour et bienvenu au programme d'apprentissage du portugais");
+        System.out.println("Bonjour et bienvenu au programme d'apprentissage d'une langue");
     }
 
     private void clearTerminal() {
