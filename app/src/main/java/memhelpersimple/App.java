@@ -2,7 +2,7 @@ package memhelpersimple;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Map;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 import model.Dictionary;
@@ -34,11 +34,11 @@ public class App {
         int i = 0;
         final int limit = dictionary.size();
         if (limit > 0) {
-        Map<String, String> shortlist = dictionary.createShortlist(limit);
+        List<String> shortlist = dictionary.createShortlist(limit);
         ui.remindRecitationRules(limit);
-        for (String key: shortlist.keySet()) {
+        for (String key: shortlist) {
             i++;
-            expectedWord = shortlist.get(key);
+            expectedWord = dictionary.get(key);
             translation = ui.askTranslation(key, score, limit, i);
             if (translation.equals("0")) {
                 i--;

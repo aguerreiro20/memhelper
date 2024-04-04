@@ -86,14 +86,10 @@ public class Dictionary {
         return map.size();
     }
 
-    public Map<String, String> createShortlist(final int limit) {
+    public List<String> createShortlist(final int limit) {
         List<String> keys = map.keySet().stream().map(String::valueOf).collect(Collectors.toList());
         Collections.shuffle(keys);
-        Map<String, String> res = new HashMap();
-        for (String key : keys) {
-            res.put(key, map.get(key));
-        }
-        return res;
+        return keys;
     }
 
     public List<String> getSortedKeys() {
